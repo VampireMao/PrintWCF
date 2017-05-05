@@ -17,7 +17,7 @@ namespace PrintService
         public bool Print(Dictionary<string, string> dc)
         {
             GridppReport report = new GridppReport();
-            report.LoadFromFile(@"D:\PrintWCF\PrintService\asset\print.grf");
+            report.LoadFromFile(@".\print.grf");
             IGRPrinter p = report.Printer;
             p.Collate = true;
             p.Copies = int.Parse(dc["打印份数"]);
