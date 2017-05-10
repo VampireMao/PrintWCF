@@ -12,6 +12,6 @@ namespace PrintContract
     public interface IPrint
     {
         [OperationContract]
-        bool Print(Dictionary<string,string> dc);
+        void Print(string orderID);
     }
 }
