@@ -12,6 +12,6 @@ namespace PrintContract
     public interface IPrint
     {
         [OperationContract]
-        void Print(string orderID);
+        void Print(string orderID, string hostname);
     }
 }

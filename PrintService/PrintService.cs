@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using gregn6Lib;
 using PrintContract;
-using System.Xml;
-using System.Drawing.Printing;
-using gregn6Lib;
+using System;
 using System.ComponentModel;
-using System.Data.OleDb;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -22,24 +15,26 @@ namespace PrintService
         GridppReport report = new GridppReport();
         public PrintService()
         {
-            report.FetchRecord += new _IGridppReportEvents_FetchRecordEventHandler(FillRecordToReport);
         }
 
-        public void Print(string orderID)
+        public void Print(string orderID, string hostname)
         {
             dt.Clear();
             id = orderID;
             string constr = ConfigurationManager.ConnectionStrings["mssql"].ConnectionString;
-            string sql = "SELECT 部门,商品名,规格,批准文号,生产厂家,数量,批号,生产日期,有效期,备注,客户名称,订单号,地址,订单日期 FROM view_select WHERE view_select.是否已删除=0 AND 订单号 LIKE @orderID";
-            SqlParameter pms = new SqlParameter("@orderID", id);
+            string sql = "SELECT 部门,商品名,规格,批准文号,生产厂家,数量,批号,生产日期,有效期,备注,客户名称,订单号,地址,订单日期 FROM view_select WHERE view_select.是否已删除=0  AND HostName=@hostname AND 订单号 LIKE @orderID";
+            SqlParameter[] pms = { new SqlParameter("@orderID", id), new SqlParameter("@hostname", hostname) };
             report.LoadFromFile(@".\print.grf");
+            ComponentResourceManager res = new ComponentResourceManager();
             using (SqlConnection conn = new SqlConnection(constr))
             {
                 SqlDataAdapter adapter = new SqlDataAdapter(sql, conn);
-                adapter.SelectCommand.Parameters.Add(pms);
+                adapter.SelectCommand.Parameters.AddRange(pms);
                 conn.Open();
                 adapter.Fill(dt);
             }
+            report.FetchRecord -= new _IGridppReportEvents_FetchRecordEventHandler(FillRecordToReport);
+            report.FetchRecord += new _IGridppReportEvents_FetchRecordEventHandler(FillRecordToReport);
             report.Print(false);
         }
 
